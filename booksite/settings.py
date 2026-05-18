@@ -15,7 +15,7 @@ SECRET_KEY = 'django-insecure-%yu#%1vi=$f%2kixl$86q$&ifb5h1st+ejetkp#^8w#%!1239k
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['tordi-catalogue.onrender.com']
 
 
 # Application definition
