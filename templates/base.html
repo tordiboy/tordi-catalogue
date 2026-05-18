@@ -1,0 +1,270 @@
+{% load book_extras %}
+
+{% load highlight %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Book App{% endblock %}</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Segoe UI", sans-serif;
+    }
+
+    body {
+      background: #0b1220;
+      color: #e5e7eb;
+    }
+
+    /* NAVBAR */
+    .navbar {
+      background: rgba(17, 24, 39, 0.95);
+      padding: 15px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      z-index: 100;
+    }
+
+    .logo {
+      font-size: 18px;
+      font-weight: bold;
+      color: #60a5fa;
+    }
+
+    /* SEARCH (DESKTOP) */
+    .search-form {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      margin: 0 15px;
+    }
+
+    .search-form input {
+      width: 60%;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #334155;
+      background: #111827;
+      color: white;
+    }
+
+    .search-form button {
+      margin-left: 10px;
+    }
+
+    /* NAV LINKS */
+    .nav-links {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .nav-links a:hover {
+      color: white;
+    }
+
+    /* BUTTON */
+    .btn {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: #3b82f6;
+      color: white;
+      font-size: 13px;
+    }
+
+    .btn-danger {
+      background: #ef4444;
+    }
+
+    /* ADMIN LINK */
+    .admin-link {
+      background: #facc15;
+      color: black !important;
+      padding: 5px 8px;
+      border-radius: 6px;
+      font-weight: bold;
+    }
+
+    /* HAMBURGER */
+    .menu-toggle {
+      display: none;
+      font-size: 22px;
+      cursor: pointer;
+    }
+
+    /* MOBILE STYLES */
+    @media (max-width: 768px) {
+
+      .menu-toggle {
+        display: block;
+      }
+
+      /* Hide search inside navbar */
+      .search-form {
+        display: none;
+      }
+
+      .nav-links {
+        position: absolute;
+        top: 60px;
+        right: 0;
+        background: #111827;
+        width: 200px;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 15px;
+        display: none;
+        border-left: 1px solid rgba(255,255,255,0.08);
+      }
+
+      .nav-links.active {
+        display: flex;
+      }
+
+      .nav-links a {
+        margin-bottom: 10px;
+      }
+
+      .nav-links form {
+        width: 100%;
+      }
+
+      .nav-links button {
+        width: 100%;
+      }
+    }
+
+    /* MOBILE SEARCH (BELOW NAVBAR) */
+    .mobile-search {
+      display: none;
+      padding: 10px;
+      background: #0b1220;
+    }
+
+    .mobile-search input {
+      width: 70%;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #334155;
+      background: #111827;
+      color: white;
+    }
+
+    .mobile-search button {
+      margin-left: 10px;
+    }
+
+    @media (max-width: 768px) {
+      .mobile-search {
+        display: flex;
+        justify-content: center;
+      }
+    }
+
+    /* CONTAINER */
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    /* FOOTER */
+    .footer {
+      text-align: center;
+      padding: 20px;
+      margin-top: 40px;
+      font-size: 13px;
+      color: #64748b;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- NAVBAR -->
+  <div class="navbar">
+
+    <div class="logo">📚 Tordi BookSphere</div>
+
+    <!-- DESKTOP SEARCH -->
+    <form method="GET" action="/" class="search-form">
+      <input type="text" name="q" placeholder="Search books...">
+      <button class="btn" type="submit">Search</button>
+    </form>
+
+    <!-- HAMBURGER -->
+    <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+
+    <!-- NAV LINKS -->
+    <div class="nav-links" id="navMenu">
+
+      <a href="/">Home</a>
+
+      {% if user.is_authenticated %}
+
+        <!-- 🔓 ADMIN (ONLY STAFF) -->
+        {% if user.is_staff %}
+          <a href="{% url 'admin_unlock' %}" class="admin-link">
+            🔓 Admin
+          </a>
+        {% endif %}
+
+        <span style="color:#93c5fd;">{{ user.username }}</span>
+
+        <form method="post" action="/accounts/logout/">
+          {% csrf_token %}
+          <button class="btn btn-danger" type="submit">Logout</button>
+        </form>
+
+      {% else %}
+        <a href="/accounts/login/">Login</a>
+        <a href="/register/">Register</a>
+      {% endif %}
+
+    </div>
+  </div>
+
+  <!-- MOBILE SEARCH -->
+  <form method="GET" action="/" class="mobile-search">
+    <input type="text" name="q" placeholder="Search books...">
+    <button class="btn" type="submit">Search</button>
+  </form>
+
+  <!-- CONTENT -->
+  <div class="container">
+    {% block content %}{% endblock %}
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    © 2026 BookSphere — Read. Learn. Grow.
+  </div>
+
+  <!-- SCRIPT -->
+  <script>
+    function toggleMenu() {
+      const menu = document.getElementById("navMenu");
+      menu.classList.toggle("active");
+    }
+  </script>
+
+</body>
+</html>

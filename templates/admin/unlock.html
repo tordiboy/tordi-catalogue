@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Dashboard</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background: #0b1220;
+      color: #e5e7eb;
+    }
+
+    /* HEADER */
+    .header {
+      padding: 20px;
+      background: #111827;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 20px;
+      color: #60a5fa;
+    }
+
+    /* SEARCH BAR */
+    .search-box {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+      outline: none;
+      background: #1f2937;
+      color: white;
+    }
+
+    button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: #3b82f6;
+      color: white;
+    }
+
+    /* CONTAINER */
+    .container {
+      padding: 20px;
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 20px;
+    }
+
+    /* PANELS */
+    .panel {
+      background: #111827;
+      padding: 15px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.05);
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .title {
+      font-size: 16px;
+      margin-bottom: 10px;
+      color: #93c5fd;
+    }
+
+    /* ITEMS */
+    .item {
+      padding: 10px;
+      margin-bottom: 8px;
+      background: #1f2937;
+      border-radius: 6px;
+    }
+
+    /* BADGES */
+    .badge {
+      font-size: 11px;
+      padding: 3px 6px;
+      border-radius: 4px;
+      margin-left: 6px;
+    }
+
+    .locked {
+      background: #ef4444;
+      color: white;
+    }
+
+    .unlocked {
+      background: #22c55e;
+      color: white;
+    }
+
+    /* BUTTON */
+    .toggle-btn {
+      margin-top: 8px;
+      width: 100%;
+      padding: 8px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .unlock {
+      background: #22c55e;
+      color: white;
+    }
+
+    .lock {
+      background: #ef4444;
+      color: white;
+    }
+
+    /* LAYOUT */
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .small {
+      font-size: 12px;
+      color: #9ca3af;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <h1>🔐 Admin Access Control Panel</h1>
+
+  <!-- SEARCH -->
+  <form method="GET" class="search-box">
+    <input type="text" name="user" placeholder="Search users..." value="{{ user_query }}">
+    <input type="text" name="book" placeholder="Search books..." value="{{ book_query }}">
+    <button>Search</button>
+  </form>
+</div>
+
+<!-- MAIN -->
+<div class="container">
+
+  <!-- USERS -->
+  <div class="panel">
+    <div class="title">👤 Users</div>
+
+    {% for user in users %}
+      <div class="item">
+        {{ user.username }}
+        <div class="small">{{ user.email }}</div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- BOOKS -->
+  <div class="panel">
+    <div class="title">📚 Books Access Control</div>
+
+    {% for book in books %}
+      <div class="item">
+
+        <div class="row">
+          <strong>{{ book.title }}</strong>
+        </div>
+
+        <div class="small">Toggle access per user:</div>
+
+        {% for user in users %}
+
+          {% with access=None %}
+          {% for a in access %}
+            {% if a.user_id == user.id and a.book_id == book.id %}
+              {% if a.unlocked %}
+                {% with status="unlocked" %}
+                {% endwith %}
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+          {% endwith %}
+
+          <!-- TOGGLE BUTTON -->
+          <a href="{% url 'toggle_access' user.id book.id %}">
+            <button class="toggle-btn">
+              Toggle {{ user.username }}
+            </button>
+          </a>
+
+        {% endfor %}
+
+      </div>
+    {% endfor %}
+
+  </div>
+
+</div>
+
+</body>
+</html>

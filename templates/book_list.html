@@ -1,0 +1,197 @@
+
+{% extends "base.html" %}
+
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+
+<style>
+/* HERO */
+.hero {
+  background: linear-gradient(135deg, #1e293b, #0f172a);
+  padding: 30px;
+  border-radius: 14px;
+  margin-bottom: 25px;
+}
+
+.hero h1 {
+  font-size: 28px;
+  color: #60a5fa;
+}
+
+.hero p {
+  color: #cbd5e1;
+  margin-top: 10px;
+}
+
+/* GRID */
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 20px;
+}
+
+/* CARD */
+.book-card {
+  background: #111827;
+  border-radius: 12px;
+  padding: 15px;
+  border: 1px solid rgba(255,255,255,0.06);
+  transition: 0.3s;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.book-card:hover {
+  transform: translateY(-5px);
+  border-color: #3b82f6;
+}
+
+/* IMAGE */
+.book-img {
+  height: 150px;
+  background: #1f2937;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+/* TITLE */
+.book-title {
+  font-size: 16px;
+  color: #e5e7eb;
+  margin-bottom: 5px;
+}
+
+/* DESCRIPTION */
+.book-desc {
+  font-size: 13px;
+  color: #9ca3af;
+  margin-bottom: 10px;
+}
+
+/* PRICE */
+.price {
+  margin-bottom: 10px;
+}
+
+.old-price {
+  text-decoration: line-through;
+  color: #9ca3af;
+  font-size: 13px;
+}
+
+.new-price {
+  color: #22c55e;
+  font-weight: bold;
+}
+
+/* BUTTONS */
+.card-btn {
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-top: auto;
+}
+
+.buy-btn {
+  background: #3b82f6;
+  color: white;
+}
+
+.buy-btn:hover {
+  background: #2563eb;
+}
+
+.read-btn {
+  background: #22c55e;
+  color: white;
+}
+
+.read-btn:hover {
+  background: #16a34a;
+}
+
+.locked {
+  color: #f87171;
+  font-size: 13px;
+  margin-bottom: 5px;
+}
+</style>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>📚 Grow Through Books</h1>
+  <p>
+    Discover powerful motivational books that can transform your mindset,
+    improve discipline, and help you achieve your goals.
+  </p>
+</div>
+
+{% if user.is_authenticated %}
+
+<h2 style="margin-bottom:15px;">🔥 Featured Books</h2>
+
+<div class="book-grid">
+
+{% for book in books %}
+  <div class="book-card">
+
+    <!-- (Optional Image Placeholder) -->
+    <div class="book-img"></div>
+
+    <div>
+      <div class="book-title">{{ book.title }}</div>
+      <div class="book-desc">{{ book.description|truncatewords:15 }}</div>
+
+      <!-- PRICE -->
+      <div class="price">
+        {% if book.has_discount %}
+          <span class="old-price">₦{{ book.price }}</span><br>
+          <span class="new-price">₦{{ book.discounted_price }}</span>
+        {% else %}
+          <span class="new-price">₦{{ book.price }}</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- ACTION -->
+    {% if book.id in unlocked_ids %}
+      <a href="{{ book.file.url }}">
+        <button class="card-btn read-btn">📖 Read Now</button>
+      </a>
+    {% else %}
+      <div class="locked">🔒 Locked</div>
+      <a 
+        href="https://wa.me/2347068848255?text=Hello%20I%20want%20to%20buy%20the%20book%20{{ book.title|urlencode }}.%20How%20do%20I%20purchase%20it%3F" 
+        target="_blank"
+      >
+        <button class="card-btn buy-btn">Buy / Unlock</button>
+      </a>
+    {% endif %}
+
+  </div>
+{% endfor %}
+
+</div>
+
+{% else %}
+
+<div style="
+  background:#111827;
+  padding:20px;
+  border-radius:12px;
+  text-align:center;
+">
+  <p style="margin-bottom:10px;">You are not logged in.</p>
+  <a href="/accounts/login/">
+    <button class="card-btn buy-btn">Login to Continue</button>
+  </a>
+</div>
+
+{% endif %}
+
+{% endblock %}
